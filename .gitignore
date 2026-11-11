@@ -1,0 +1,21 @@
+# Virtual Environment
+.venv/
+venv/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+
+# Environment Variables and API Keys
+.env
+.env.*
+
+# Allow example environment file
+!.env.example
+
+# IDE Settings
+.vscode/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
