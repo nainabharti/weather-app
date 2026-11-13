@@ -33,7 +33,7 @@ params = {
     "appid": api_key
 }
 
-# Send GET request
+# Send GET request to Geocoding API
 response = requests.get(geo_url, params=params)
 
 # Check response status
@@ -51,6 +51,31 @@ if response.status_code == 200:
         print(f"Latitude: {latitude}")
         print(f"Longitude: {longitude}")
 
+        # Current Weather API endpoint
+        weather_url = "https://api.openweathermap.org/data/2.5/weather"
+
+        # Parameters for Current Weather API 
+        weather_params = {
+            "lat": latitude,
+            "lon": longitude,
+            "appid": api_key,
+            "units": "metric"
+        }
+
+        # Send GET request to Current Weather API 
+        weather_response = requests.get(weather_url, params=weather_params)
+
+        # Check Current Weather API response
+        if weather_response.status_code == 200:
+            weather_data = weather_response.json()
+            print("\nWeather data fetched successfully!")
+        else:
+            print("\nUnable to fetch weather information.")
+            print("Status code:",weather_response.status_code)
+
     else:
-        print("Unable to fetch location information.")
-        print("Status code:",response.status_code)
+        print("City not found. Please enter a valid city name.")
+
+else:
+    print("Unable to fetch location information.")
+    print("Status code:",response.status_code)
