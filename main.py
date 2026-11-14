@@ -26,7 +26,7 @@ print(f"\nFetching weather information for {city}...")
 # Geocoding API endpoint
 geo_url = "https://api.openweathermap.org/geo/1.0/direct"
 
-# Parameters for API request
+# Parameters for Geocoding API
 params = {
     "q": city,
     "limit": 1,
@@ -68,7 +68,23 @@ if response.status_code == 200:
         # Check Current Weather API response
         if weather_response.status_code == 200:
             weather_data = weather_response.json()
-            print("\nWeather data fetched successfully!")
+
+            # Extract weather details
+            temperature = weather_data["main"]["temp"]
+            feels_like = weather_data["main"]["feels_like"]
+            humidity = weather_data["main"]["humidity"]
+            description = weather_data["weather"][0]["description"]
+            wind_speed = weather_data["wind"]["speed"]
+
+            # Display weather report
+            print("\n===== WEATHER REPORT =====")
+            print(f"City: {location_data[0]['name']}")
+            print(f"Temperature: {temperature}°C")
+            print(f"Feels like: {feels_like}°C")
+            print(f"Humidity: {humidity}%")
+            print(f"Weather: {description}")
+            print(f"Wind Speed: {wind_speed}m/s")
+
         else:
             print("\nUnable to fetch weather information.")
             print("Status code:",weather_response.status_code)
