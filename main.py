@@ -19,6 +19,9 @@ else:
 
 # Take city name from user
 city = input("Enter city name: ").strip()
+if not city:
+    print("Please enter a city name.")
+    exit()
 
 # Display entered city
 print(f"\nFetching weather information for {city}...")
@@ -34,8 +37,11 @@ params = {
 }
 
 # Send GET request to Geocoding API
-response = requests.get(geo_url, params=params)
-
+try:
+    response = requests.get(geo_url, params=params)
+except requests.exceptions.RequestException:
+    print("Network error! Please check your internet connection.")
+    exit()
 # Check response status
 if response.status_code == 200:
 
@@ -63,8 +69,11 @@ if response.status_code == 200:
         }
 
         # Send GET request to Current Weather API 
-        weather_response = requests.get(weather_url, params=weather_params)
-
+        try:
+            weather_response = requests.get(weather_url, params=weather_params)
+        except requests.exceptions.RequestException:
+            print("Network error! Please check your internet connection.")
+            exit()
         # Check Current Weather API response
         if weather_response.status_code == 200:
             weather_data = weather_response.json()
@@ -88,10 +97,25 @@ if response.status_code == 200:
         else:
             print("\nUnable to fetch weather information.")
             print("Status code:",weather_response.status_code)
-
+            if weather_response.status_code == 401:
+                print("Invalid or inactive API key.")
+            elif weather_response.status_code == 429:
+                print("API request limit exceeded.")
+            elif weather_response.status_code >= 500:
+                print("OpenWeather server error.")
+            else:
+                print("Please check your request and try again.")
     else:
         print("City not found. Please enter a valid city name.")
 
 else:
     print("Unable to fetch location information.")
     print("Status code:",response.status_code)
+    if response.status_code == 401:
+        print("Invalid or inactive API key.")
+    elif response.status_code == 429:
+        print("API request limit exceeded.")
+    elif response.status_code >= 500:
+        print("OpenWeather server error.")
+    else:
+        print("Please check your request and try again.")
