@@ -148,34 +148,42 @@ def main():
     if api_key is None:
         return
 
-    # Get city name
-    city = get_city()
+    # Multiple city search
+    while True:
 
-    if city is None:
-        return
+        # Get city name
+        city = get_city()
 
-    print(f"\nFetching weather information for {city}...")
+        if city is None:
+            continue
 
-    # Get geographical coordinates
-    location = get_coordinates(city, api_key)
+        print(f"\nFetching weather information for {city}...")
 
-    if location is None:
-        return
+        # Get geographical coordinates
+        location = get_coordinates(city, api_key)
 
-    latitude, longitude, city_name = location
+        if location is None:
+            continue
 
-    print("\nLocation found successfully!")
+        latitude, longitude, city_name = location
 
-    # Fetch weather data
-    weather_data = get_weather(latitude, longitude, api_key)
+        print("\nLocation found successfully!")
 
-    if weather_data is None:
-        return
+        # Fetch weather data
+        weather_data = get_weather(latitude, longitude, api_key)
 
-    # Display weather information
-    display_weather(city_name, weather_data)
+        if weather_data is None:
+            continue
 
+        # Display weather information
+        display_weather(city_name, weather_data)
 
+        # Ask user for another search
+        choice = input("\nDo you want to search another city? (yes/no):").strip().lower()
+
+        if choice != "yes":
+            print("\nThank you for using Weather App!")
+            break
 # Program execution starts here
 if __name__ == "__main__":
     main()
