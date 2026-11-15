@@ -41,13 +41,10 @@ def get_temperature_unit():
 
         if choice == "1":
             return "metric"
-
         elif choice == "2":
             return "imperial"
-
         elif choice == "3":
             return "standard"
-
         else:
             print("Invalid choice! Please select 1, 2, or 3.")
 
@@ -143,7 +140,41 @@ def get_weather(latitude, longitude, api_key, unit):
         return None
 
 
-# Function 6: Display weather report
+# Function 6: Get weather condition icon
+def get_weather_icon(weather_id):
+
+    if 200 <= weather_id <= 232:
+        return "⛈️"
+
+    elif 300 <= weather_id <= 321:
+        return "🌦️"
+
+    elif 500 <= weather_id <= 531:
+        return "🌧️"
+
+    elif 600 <= weather_id <= 622:
+        return "❄️"
+
+    elif 701 <= weather_id <= 781:
+        return "🌫️"
+
+    elif weather_id == 800:
+        return "☀️"
+
+    elif weather_id == 801:
+        return "🌤️"
+
+    elif weather_id == 802:
+        return "⛅"
+
+    elif 803 <= weather_id <= 804:
+        return "☁️"
+
+    else:
+        return "🌍"
+
+
+# Function 7: Display weather report
 def display_weather(city_name, weather_data, unit):
 
     temperature = weather_data["main"]["temp"]
@@ -151,6 +182,9 @@ def display_weather(city_name, weather_data, unit):
     humidity = weather_data["main"]["humidity"]
     description = weather_data["weather"][0]["description"]
     wind_speed = weather_data["wind"]["speed"]
+
+    weather_id = weather_data["weather"][0]["id"]
+    icon = get_weather_icon(weather_id)
 
     # Select temperature symbol
     if unit == "metric":
@@ -165,11 +199,11 @@ def display_weather(city_name, weather_data, unit):
     print(f"Temperature: {temperature}{symbol}")
     print(f"Feels Like: {feels_like}{symbol}")
     print(f"Humidity: {humidity}%")
-    print(f"Weather: {description}")
+    print(f"Weather: {icon} {description}")
     print(f"Wind Speed: {wind_speed} m/s")
 
 
-# Function 7: Main function
+# Function 8: Main function
 def main():
 
     print("===== WEATHER APP =====")
