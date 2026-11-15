@@ -194,13 +194,19 @@ def display_weather(city_name, weather_data, unit):
     else:
         symbol = "K"
 
+    # Select wind speed unit
+    if unit == "imperial":
+        wind_unit = "mph"
+    else:
+        wind_unit = "m/s"
+
     print("\n===== WEATHER REPORT =====")
     print(f"City: {city_name}")
     print(f"Temperature: {temperature}{symbol}")
     print(f"Feels Like: {feels_like}{symbol}")
     print(f"Humidity: {humidity}%")
     print(f"Weather: {icon} {description}")
-    print(f"Wind Speed: {wind_speed} m/s")
+    print(f"Wind Speed: {wind_speed} {wind_unit}")
 
 
 # Function 8: Main function
