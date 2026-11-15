@@ -179,11 +179,16 @@ def main():
         display_weather(city_name, weather_data)
 
         # Ask user for another search
-        choice = input("\nDo you want to search another city? (yes/no):").strip().lower()
+        while True:
+            choice = input("\nDo you want to search another city? (yes/no):").strip().lower()
 
-        if choice != "yes":
-            print("\nThank you for using Weather App!")
-            break
+            if choice == "yes":
+                break
+            elif choice == "no":
+                print("\nThank you for using Weather App!")
+                return
+            else:
+                print("Invalid choice! Please enter yes or no.")
 # Program execution starts here
 if __name__ == "__main__":
     main()
