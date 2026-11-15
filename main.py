@@ -2,120 +2,180 @@ import os
 import requests
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
 
-# Retrieve API key
-api_key = os.getenv("OPENWEATHER_API_KEY")
+# Function 1: Load and verify API key
+def get_api_key():
+    load_dotenv()
 
-print("===== WEATHER APP =====")
+    api_key = os.getenv("OPENWEATHER_API_KEY")
 
-# Check API key
-if api_key:
-    print("API key loaded successfully!")
-else:
-    print("API key not found. Please check your .env file.")
-    exit()
+    if api_key:
+        print("API key loaded successfully!")
+        return api_key
+    else:
+        print("API key not found. Please check your .env file.")
+        return None
 
-# Take city name from user
-city = input("Enter city name: ").strip()
-if not city:
-    print("Please enter a city name.")
-    exit()
 
-# Display entered city
-print(f"\nFetching weather information for {city}...")
+# Function 2: Take and validate city name
+def get_city():
+    city = input("Enter city name: ").strip()
 
-# Geocoding API endpoint
-geo_url = "https://api.openweathermap.org/geo/1.0/direct"
+    if not city:
+        print("Please enter a city name.")
+        return None
 
-# Parameters for Geocoding API
-params = {
-    "q": city,
-    "limit": 1,
-    "appid": api_key
-}
+    return city
 
-# Send GET request to Geocoding API
-try:
-    response = requests.get(geo_url, params=params)
-except requests.exceptions.RequestException:
-    print("Network error! Please check your internet connection.")
-    exit()
-# Check response status
-if response.status_code == 200:
 
-    # Convert JSON response into Python data
-    location_data = response.json()
+# Function 3: Fetch latitude and longitude
+def get_coordinates(city, api_key):
 
-    if location_data:
-        latitude = location_data[0]["lat"]
-        longitude = location_data[0]["lon"]
+    geo_url = "https://api.openweathermap.org/geo/1.0/direct"
 
-        print("\nLocation found successfully!")
-        print(f"City: {location_data[0]['name']}")
-        print(f"Latitude: {latitude}")
-        print(f"Longitude: {longitude}")
+    params = {
+        "q": city,
+        "limit": 1,
+        "appid": api_key
+    }
 
-        # Current Weather API endpoint
-        weather_url = "https://api.openweathermap.org/data/2.5/weather"
+    try:
+        response = requests.get(geo_url, params=params, timeout=10)
 
-        # Parameters for Current Weather API 
-        weather_params = {
-            "lat": latitude,
-            "lon": longitude,
-            "appid": api_key,
-            "units": "metric"
-        }
+    except requests.exceptions.RequestException:
+        print("Network error! Please check your internet connection.")
+        return None
 
-        # Send GET request to Current Weather API 
-        try:
-            weather_response = requests.get(weather_url, params=weather_params)
-        except requests.exceptions.RequestException:
-            print("Network error! Please check your internet connection.")
-            exit()
-        # Check Current Weather API response
-        if weather_response.status_code == 200:
-            weather_data = weather_response.json()
+    if response.status_code == 200:
 
-            # Extract weather details
-            temperature = weather_data["main"]["temp"]
-            feels_like = weather_data["main"]["feels_like"]
-            humidity = weather_data["main"]["humidity"]
-            description = weather_data["weather"][0]["description"]
-            wind_speed = weather_data["wind"]["speed"]
+        location_data = response.json()
 
-            # Display weather report
-            print("\n===== WEATHER REPORT =====")
-            print(f"City: {location_data[0]['name']}")
-            print(f"Temperature: {temperature}°C")
-            print(f"Feels like: {feels_like}°C")
-            print(f"Humidity: {humidity}%")
-            print(f"Weather: {description}")
-            print(f"Wind Speed: {wind_speed}m/s")
+        if location_data:
+            latitude = location_data[0]["lat"]
+            longitude = location_data[0]["lon"]
+            city_name = location_data[0]["name"]
+
+            return latitude, longitude, city_name
 
         else:
-            print("\nUnable to fetch weather information.")
-            print("Status code:",weather_response.status_code)
-            if weather_response.status_code == 401:
-                print("Invalid or inactive API key.")
-            elif weather_response.status_code == 429:
-                print("API request limit exceeded.")
-            elif weather_response.status_code >= 500:
-                print("OpenWeather server error.")
-            else:
-                print("Please check your request and try again.")
-    else:
-        print("City not found. Please enter a valid city name.")
+            print("City not found. Please enter a valid city name.")
+            return None
 
-else:
-    print("Unable to fetch location information.")
-    print("Status code:",response.status_code)
-    if response.status_code == 401:
-        print("Invalid or inactive API key.")
-    elif response.status_code == 429:
-        print("API request limit exceeded.")
-    elif response.status_code >= 500:
-        print("OpenWeather server error.")
     else:
-        print("Please check your request and try again.")
+        print("Unable to fetch location information.")
+        print("Status code:", response.status_code)
+
+        if response.status_code == 401:
+            print("Invalid or inactive API key.")
+        elif response.status_code == 429:
+            print("API request limit exceeded.")
+        elif response.status_code >= 500:
+            print("OpenWeather server error.")
+        else:
+            print("Please check your request and try again.")
+
+        return None
+
+
+# Function 4: Fetch current weather information
+def get_weather(latitude, longitude, api_key):
+
+    weather_url = "https://api.openweathermap.org/data/2.5/weather"
+
+    weather_params = {
+        "lat": latitude,
+        "lon": longitude,
+        "appid": api_key,
+        "units": "metric"
+    }
+
+    try:
+        weather_response = requests.get(
+            weather_url,
+            params=weather_params,
+            timeout=10
+        )
+
+    except requests.exceptions.RequestException:
+        print("Network error! Please check your internet connection.")
+        return None
+
+    if weather_response.status_code == 200:
+        return weather_response.json()
+
+    else:
+        print("Unable to fetch weather information.")
+        print("Status code:", weather_response.status_code)
+
+        if weather_response.status_code == 401:
+            print("Invalid or inactive API key.")
+        elif weather_response.status_code == 429:
+            print("API request limit exceeded.")
+        elif weather_response.status_code >= 500:
+            print("OpenWeather server error.")
+        else:
+            print("Please check your request and try again.")
+
+        return None
+
+
+# Function 5: Display weather report
+def display_weather(city_name, weather_data):
+
+    temperature = weather_data["main"]["temp"]
+    feels_like = weather_data["main"]["feels_like"]
+    humidity = weather_data["main"]["humidity"]
+    description = weather_data["weather"][0]["description"]
+    wind_speed = weather_data["wind"]["speed"]
+
+    print("\n===== WEATHER REPORT =====")
+    print(f"City: {city_name}")
+    print(f"Temperature: {temperature}°C")
+    print(f"Feels Like: {feels_like}°C")
+    print(f"Humidity: {humidity}%")
+    print(f"Weather: {description}")
+    print(f"Wind Speed: {wind_speed} m/s")
+
+
+# Function 6: Main function
+def main():
+
+    print("===== WEATHER APP =====")
+
+    # Get API key
+    api_key = get_api_key()
+
+    if api_key is None:
+        return
+
+    # Get city name
+    city = get_city()
+
+    if city is None:
+        return
+
+    print(f"\nFetching weather information for {city}...")
+
+    # Get geographical coordinates
+    location = get_coordinates(city, api_key)
+
+    if location is None:
+        return
+
+    latitude, longitude, city_name = location
+
+    print("\nLocation found successfully!")
+
+    # Fetch weather data
+    weather_data = get_weather(latitude, longitude, api_key)
+
+    if weather_data is None:
+        return
+
+    # Display weather information
+    display_weather(city_name, weather_data)
+
+
+# Program execution starts here
+if __name__ == "__main__":
+    main()
