@@ -28,7 +28,31 @@ def get_city():
     return city
 
 
-# Function 3: Fetch latitude and longitude
+# Function 3: Select temperature unit
+def get_temperature_unit():
+
+    while True:
+        print("\nSelect Temperature Unit:")
+        print("1. Celsius (°C)")
+        print("2. Fahrenheit (°F)")
+        print("3. Kelvin (K)")
+
+        choice = input("Enter your choice (1/2/3): ").strip()
+
+        if choice == "1":
+            return "metric"
+
+        elif choice == "2":
+            return "imperial"
+
+        elif choice == "3":
+            return "standard"
+
+        else:
+            print("Invalid choice! Please select 1, 2, or 3.")
+
+
+# Function 4: Fetch latitude and longitude
 def get_coordinates(city, api_key):
 
     geo_url = "https://api.openweathermap.org/geo/1.0/direct"
@@ -77,8 +101,8 @@ def get_coordinates(city, api_key):
         return None
 
 
-# Function 4: Fetch current weather information
-def get_weather(latitude, longitude, api_key):
+# Function 5: Fetch current weather information
+def get_weather(latitude, longitude, api_key, unit):
 
     weather_url = "https://api.openweathermap.org/data/2.5/weather"
 
@@ -86,7 +110,7 @@ def get_weather(latitude, longitude, api_key):
         "lat": latitude,
         "lon": longitude,
         "appid": api_key,
-        "units": "metric"
+        "units": unit
     }
 
     try:
@@ -119,8 +143,8 @@ def get_weather(latitude, longitude, api_key):
         return None
 
 
-# Function 5: Display weather report
-def display_weather(city_name, weather_data):
+# Function 6: Display weather report
+def display_weather(city_name, weather_data, unit):
 
     temperature = weather_data["main"]["temp"]
     feels_like = weather_data["main"]["feels_like"]
@@ -128,16 +152,24 @@ def display_weather(city_name, weather_data):
     description = weather_data["weather"][0]["description"]
     wind_speed = weather_data["wind"]["speed"]
 
+    # Select temperature symbol
+    if unit == "metric":
+        symbol = "°C"
+    elif unit == "imperial":
+        symbol = "°F"
+    else:
+        symbol = "K"
+
     print("\n===== WEATHER REPORT =====")
     print(f"City: {city_name}")
-    print(f"Temperature: {temperature}°C")
-    print(f"Feels Like: {feels_like}°C")
+    print(f"Temperature: {temperature}{symbol}")
+    print(f"Feels Like: {feels_like}{symbol}")
     print(f"Humidity: {humidity}%")
     print(f"Weather: {description}")
     print(f"Wind Speed: {wind_speed} m/s")
 
 
-# Function 6: Main function
+# Function 7: Main function
 def main():
 
     print("===== WEATHER APP =====")
@@ -147,6 +179,9 @@ def main():
 
     if api_key is None:
         return
+
+    # Select temperature unit
+    unit = get_temperature_unit()
 
     # Multiple city search
     while True:
@@ -170,25 +205,34 @@ def main():
         print("\nLocation found successfully!")
 
         # Fetch weather data
-        weather_data = get_weather(latitude, longitude, api_key)
+        weather_data = get_weather(
+            latitude, longitude, api_key, unit
+        )
 
         if weather_data is None:
             continue
 
         # Display weather information
-        display_weather(city_name, weather_data)
+        display_weather(city_name, weather_data, unit)
 
         # Ask user for another search
         while True:
-            choice = input("\nDo you want to search another city? (yes/no):").strip().lower()
+
+            choice = input(
+                "\nDo you want to search another city? (yes/no): "
+            ).strip().lower()
 
             if choice == "yes":
                 break
+
             elif choice == "no":
                 print("\nThank you for using Weather App!")
                 return
+
             else:
                 print("Invalid choice! Please enter yes or no.")
+
+
 # Program execution starts here
 if __name__ == "__main__":
     main()
